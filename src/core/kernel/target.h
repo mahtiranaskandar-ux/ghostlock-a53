@@ -129,7 +129,7 @@ namespace ghostlock::kernel {
     /* Fake waiter and task layouts. */
     inline constexpr int32_t FAKE_WAITER_TREE_PRIO_OFF = 0x18;
     inline constexpr int32_t FAKE_WAITER_TREE_DEADLINE_OFF = 0x20;
-    inline constexpr int32_t FAKE_WAITER_PI_TREE_ENTRY_OFF = 0x28;
+    inline constexpr int32_t FAKE_WAITER_PI_TREE_ENTRY_OFF = 0x18;
     inline constexpr int32_t FAKE_WAITER_PI_TREE_PRIO_OFF = 0x40;
     inline constexpr int32_t FAKE_WAITER_PI_TREE_DEADLINE_OFF = 0x48;
     inline constexpr int32_t FAKE_WAITER_TASK_OFF = 0x50;
