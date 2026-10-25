@@ -1,0 +1,102 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ONDK_VERSION: r30.1
+  TARGET_KERNEL: 5.10.236-android12-9-00003-gfb24cf99ad97-ab14313284
+
+jobs:
+  apk:
+    name: Release APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache ONDK
+        id: ondk-cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/ondk
+          key: ondk-${{ env.ONDK_VERSION }}-linux
+
+      - name: Install ONDK
+        if: steps.ondk-cache.outputs.cache-hit != 'true'
+        run: |
+          url="https://github.com/topjohnwu/ondk/releases/download/${ONDK_VERSION}/ondk-${ONDK_VERSION}-linux.tar.xz"
+          mkdir -p "${{ runner.temp }}/ondk"
+          curl -fL "$url" -o "${{ runner.temp }}/ondk.tar.xz"
+          tar -C "${{ runner.temp }}/ondk" --strip-components=1 -xf "${{ runner.temp }}/ondk.tar.xz"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Unit tests
+        run: ./gradlew :app:testDebugUnitTest :profile-core:test --no-daemon
+
+      - name: Build native binary
+        run: |
+          export ANDROID_NDK_HOME="${{ runner.temp }}/ondk"
+          export NDK_ROOT="$ANDROID_NDK_HOME"
+          make -C src ghostlock EXTRA_CXXFLAGS=-DGHOSTLOCK_TARGET_A53_5_10
+          "${{ runner.temp }}/ondk/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip" --strip-all build/native/ghostlock
+
+      - name: Detect signing secrets
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: echo "HAS_SIGNING_KEY=$([ -n "$SIGNING_KEY" ] && echo true || echo false)" >> "$GITHUB_ENV"
+
+      - name: Restore release keystore
+        if: env.HAS_SIGNING_KEY == 'true'
+        run: |
+          echo "${{ secrets.SIGNING_KEY }}" | base64 -d > keystore.jks
+          echo "KEYSTORE_PATH=$PWD/keystore.jks" >> "$GITHUB_ENV"
+          echo "KEYSTORE_PASS=${{ secrets.KEY_STORE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "KEY_ALIAS=${{ secrets.ALIAS }}" >> "$GITHUB_ENV"
+          echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> "$GITHUB_ENV"
+
+      - name: Report signing mode
+        run: |
+          if [ "${HAS_SIGNING_KEY:-false}" = "true" ] && [ -f keystore.jks ]; then
+            echo "release keystore present; APK will be signed"
+          else
+            echo "::warning::no SIGNING_KEY secret; falling back to the debug key"
+          fi
+
+      - name: Link the ONDK rust toolchain
+        env:
+          ONDK_HOME: ${{ runner.temp }}/ondk
+        run: |
+          rustup toolchain link ondk "$ONDK_HOME/toolchains/rust"
+          rustup default stable
+
+      - name: Build APK
+        env:
+          ANDROID_NDK_HOME: ${{ runner.temp }}/ondk
+          NDK_ROOT: ${{ runner.temp }}/ondk
+          ONDK_HOME: ${{ runner.temp }}/ondk
+        run: ./gradlew :app:assembleRelease --no-daemon
+
+      - name: Assemble artifacts
+        run: |
+          mkdir -p dist
+          cp build/native/ghostlock dist/ghostlock-${TARGET_KERNEL}
+          cp build/app/outputs/apk/release/*.apk "dist/GhostLock-${TARGET_KERNEL}.apk"
+          sha256sum dist/* | tee dist/SHA256SUMS
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghostlock-apk
+          path: dist/
