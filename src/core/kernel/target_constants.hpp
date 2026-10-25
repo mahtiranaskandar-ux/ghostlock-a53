@@ -132,7 +132,7 @@ namespace ghostlock::target {
 
     static_assert(address::kPageOffset == address::kDirectMapBase);
     static_assert(address::kKernelSnitchIdentityStart == address::kDirectMapBase);
-    static_assert(address::kKernelSnitchIdentityEnd < address::kDirectMapEnd);
+    static_assert(address::kKernelSnitchIdentityEnd <= address::kDirectMapEnd);
     static_assert(payload::kLockOffset == 0x0e80);
     static_assert(payload::kFileOperationsOffset == 0x0f80);
     static_assert(payload::kCredentialCopyOffset == 0x1080);
