@@ -103,72 +103,72 @@ namespace ghostlock::profile {
     }
 
     inline uint32_t fake_task_prio_off() {
-        return symbol_u32([](const kernel_offsets &v) { return v.task.prio; }, 0x94);
+        return symbol_u32([](const kernel_offsets &v) { return v.task.prio; }, 0x84);
     }
 
     inline uint32_t fake_task_normal_prio_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.normal_prio; }, 0x9C);
+            [](const kernel_offsets &v) { return v.task.normal_prio; }, 0x8C);
     }
 
     inline uint32_t fake_task_task_group_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.sched_task_group; }, 0x420);
+            [](const kernel_offsets &v) { return v.task.sched_task_group; }, 0x310);
     }
 
     inline uint32_t fake_task_pi_lock_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.pi_lock; }, 0x9EC);
+            [](const kernel_offsets &v) { return v.task.pi_lock; }, 0x86C);
     }
 
     inline uint32_t fake_task_pi_waiters_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.pi_waiters; }, 0xA00);
+            [](const kernel_offsets &v) { return v.task.pi_waiters; }, 0x880);
     }
 
     inline uint32_t fake_task_pi_top_task_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.pi_top_task; }, 0xA10);
+            [](const kernel_offsets &v) { return v.task.pi_top_task; }, 0x890);
     }
 
     inline uint32_t fake_task_pi_blocked_on_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.pi_blocked_on; }, 0xA18);
+            [](const kernel_offsets &v) { return v.task.pi_blocked_on; }, 0x898);
     }
 
     inline uint32_t task_pid_off() {
-        return symbol_u32([](const kernel_offsets &v) { return v.task.pid; }, 0x708);
+        return symbol_u32([](const kernel_offsets &v) { return v.task.pid; }, 0x5C8);
     }
 
     inline uint32_t task_tgid_off() {
-        return symbol_u32([](const kernel_offsets &v) { return v.task.tgid; }, 0x70C);
+        return symbol_u32([](const kernel_offsets &v) { return v.task.tgid; }, 0x5CC);
     }
 
     inline uint32_t task_atomic_flags_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.atomic_flags; }, 0x6C8);
+            [](const kernel_offsets &v) { return v.task.atomic_flags; }, 0x590);
     }
 
     inline uint32_t task_real_cred_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.real_cred; }, 0x8F8);
+            [](const kernel_offsets &v) { return v.task.real_cred; }, 0x778);
     }
 
     inline uint32_t task_cred_off() {
-        return symbol_u32([](const kernel_offsets &v) { return v.task.cred; }, 0x900);
+        return symbol_u32([](const kernel_offsets &v) { return v.task.cred; }, 0x780);
     }
 
     inline uint32_t task_comm_off() {
-        return symbol_u32([](const kernel_offsets &v) { return v.task.comm; }, 0x910);
+        return symbol_u32([](const kernel_offsets &v) { return v.task.comm; }, 0x790);
     }
 
     inline uint32_t task_tasks_off() {
-        return symbol_u32([](const kernel_offsets &v) { return v.task.tasks; }, 0x638);
+        return symbol_u32([](const kernel_offsets &v) { return v.task.tasks; }, 0x4C8);
     }
 
     inline uint32_t task_seccomp_off() {
         return symbol_u32(
-            [](const kernel_offsets &v) { return v.task.seccomp; }, 0x9C8);
+            [](const kernel_offsets &v) { return v.task.seccomp; }, 0x848);
     }
 } // namespace ghostlock::profile
 
