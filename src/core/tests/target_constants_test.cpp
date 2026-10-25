@@ -115,7 +115,7 @@ static_assert(ghostlock::kernel::SLIDE_SYSCTL_BOOTID_OFF == 0x02379ed8ULL);
 static_assert(ghostlock::kernel::PSELECT_WAITER_WORD_SHIFT == -2);
 static_assert(ghostlock::kernel::FAKE_WAITER_TREE_PRIO_OFF == 0x18);
 static_assert(ghostlock::kernel::FAKE_WAITER_TREE_DEADLINE_OFF == 0x20);
-static_assert(ghostlock::kernel::FAKE_WAITER_PI_TREE_ENTRY_OFF == 0x28);
+static_assert(ghostlock::kernel::FAKE_WAITER_PI_TREE_ENTRY_OFF == 0x18);
 static_assert(ghostlock::kernel::FAKE_WAITER_PI_TREE_PRIO_OFF == 0x40);
 static_assert(ghostlock::kernel::FAKE_WAITER_PI_TREE_DEADLINE_OFF == 0x48);
 static_assert(ghostlock::kernel::FAKE_WAITER_TASK_OFF == 0x50);
