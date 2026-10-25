@@ -5,56 +5,75 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+env:
+  ONDK_VERSION: r30.1
+  TARGET_KERNEL: 5.10.236-android12-9-00003-gfb24cf99ad97-ab14313284
+
 jobs:
-  build-apk:
+  apk:
+    name: Release APK
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
-          java-version: 21
-          distribution: zulu
+          distribution: temurin
+          java-version: '21'
 
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Cache ONDK
+        id: ondk-cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/ondk
+          key: ondk-${{ env.ONDK_VERSION }}-linux
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Download ONDK
+      - name: Install ONDK
+        if: steps.ondk-cache.outputs.cache-hit != 'true'
         run: |
-          url="https://github.com/topjohnwu/ondk/releases/download/r30.1/ondk-r30.1-linux.tar.xz"
+          url="https://github.com/topjohnwu/ondk/releases/download/${ONDK_VERSION}/ondk-${ONDK_VERSION}-linux.tar.xz"
           mkdir -p "${{ runner.temp }}/ondk"
           curl -fL "$url" -o "${{ runner.temp }}/ondk.tar.xz"
           tar -C "${{ runner.temp }}/ondk" --strip-components=1 -xf "${{ runner.temp }}/ondk.tar.xz"
 
-      - name: Link ONDK Rust toolchain
-        run: rustup toolchain link ondk "${{ runner.temp }}/ondk/toolchains/rust"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
 
-      - name: Build Ghostlock binary
+      - name: Unit tests
+        run: ./gradlew :app:testDebugUnitTest :profile-core:test --no-daemon
+
+      - name: Build native binary
         run: |
           export ANDROID_NDK_HOME="${{ runner.temp }}/ondk"
           export NDK_ROOT="$ANDROID_NDK_HOME"
           make -C src ghostlock
 
-      - name: Build APK (debug)
+      - name: Link the ONDK rust toolchain
+        env:
+          ONDK_HOME: ${{ runner.temp }}/ondk
         run: |
-          export ONDK_HOME="${{ runner.temp }}/ondk"
-          export ANDROID_NDK_HOME="$ONDK_HOME"
-          export NDK_ROOT="$ONDK_HOME"
-          ./gradlew :app:assembleDebug --no-daemon
+          rustup toolchain link ondk "$ONDK_HOME/toolchains/rust"
+          rustup default stable
 
-      - name: Find APK files
-        run: find . -name "*.apk" -type f
+      - name: Build APK
+        env:
+          ANDROID_NDK_HOME: ${{ runner.temp }}/ondk
+          NDK_ROOT: ${{ runner.temp }}/ondk
+          ONDK_HOME: ${{ runner.temp }}/ondk
+        run: ./gradlew :app:assembleRelease --no-daemon
 
-      - name: Upload APK
+      - name: Assemble artifacts
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/apk/release/*.apk "dist/GhostLock-${TARGET_KERNEL}.apk"
+          cp build/native/ghostlock dist/ghostlock-${TARGET_KERNEL}
+          sha256sum dist/* | tee dist/SHA256SUMS
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GhostLock-debug-apk
-          path: |
-            **/build/outputs/apk/**/*.apk
-            **/*.apk
-          if-no-files-found: error
+          name: ghostlock-apk
+          path: dist/
