@@ -47,9 +47,14 @@ jobs:
           export NDK_ROOT="$ONDK_HOME"
           ./gradlew :app:assembleDebug --no-daemon
 
+      - name: Find APK files
+        run: find . -name "*.apk" -type f
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: GhostLock-debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: |
+            **/build/outputs/apk/**/*.apk
+            **/*.apk
           if-no-files-found: error
