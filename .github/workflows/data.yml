@@ -34,7 +34,7 @@ jobs:
       - name: Link ONDK Rust toolchain
         run: rustup toolchain link ondk "${{ runner.temp }}/ondk/toolchains/rust"
 
-      - name: Build Ghostlock binary (default layout)
+      - name: Build Ghostlock binary
         run: |
           export ANDROID_NDK_HOME="${{ runner.temp }}/ondk"
           export NDK_ROOT="$ANDROID_NDK_HOME"
@@ -52,4 +52,4 @@ jobs:
         with:
           name: GhostLock-debug-apk
           path: app/build/outputs/apk/debug/*.apk
-          archive: false
+          if-no-files-found: error
