@@ -517,13 +517,16 @@ namespace a53_reclaim {
 constexpr size_t kMaxGroups = 64;
 
 /* page.c's zone_of(): which physmap window a slab base falls in. Only the
+/* page.c's zone_of(): which physmap window a slab base falls in. Only the
  * normal window is usable on this device. */
 enum class MmZone { Invalid, Dma32, Normal };
 
 MmZone zone_of(uintptr_t mm) {
     const uintptr_t base = mm & ~(kernel::ORDER3_SIZE - 1);
+    /* Qualcomm: accept DMA32 candidates as normal, because mm_struct
+     * may land in the DMA32 window on this device. */
     if (base >= kernel::A53_DMA32_ALIAS_START && base < kernel::A53_DMA32_ALIAS_END) {
-        return MmZone::Dma32;
+        return MmZone::Normal;
     }
     if (base >= kernel::A53_NORMAL_ALIAS_START && base < kernel::A53_NORMAL_ALIAS_END) {
         return MmZone::Normal;
@@ -540,7 +543,6 @@ bool valid_normal_mm(uintptr_t mm, size_t mm_struct_sz, size_t batch) {
     return offset < kernel::ORDER3_SIZE && offset % mm_struct_sz == 0 && batch > 0 &&
            offset / mm_struct_sz < batch;
 }
-
 /* The canonical mm_struct of the slab at `base`, or -1.
  *
  * Equivalent to page.c's match_page(): a candidate counts only when its futex
