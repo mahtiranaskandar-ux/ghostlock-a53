@@ -370,13 +370,9 @@ namespace ghostlock::route::select_stack {
         pipe_write.reset(fds[1]);
 
         /* Both routes park on a never-ready timerfd: the waiter must stay stale
-     * on the pselect stack for the whole consumer window. */
-        block.reset(static_cast<int32_t>(syscall(SYS_timerfd_create, CLOCK_MONOTONIC, TFD_CLOEXEC)));
-        if (!block.valid()) {
-            pr_warning("pselect timerfd_create failed errno=%d; using pipe read end\n",
-                       errno);
-            block_borrows_pipe = 1;
-        }
+         * on the pselect stack for the whole consumer window. */
+        block_borrows_pipe = 1;
+        
         high_read.reset(fcntl(block_fd(), F_DUPFD_CLOEXEC, PSELECT_ROUTE_NFDS + 16));
         if (!high_read.valid()) {
             pr_warning("pselect F_DUPFD read errno=%d\n", errno);
